@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengarsipan Surat Masuk dan Keluar - UKPBJ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            red: '#E51937',
+                            redHover: '#C4122B',
+                            dark: '#0F172A',
+                            surface: '#1E293B',
+                            lightBg: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Background Gradients & Glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .login-bg {
+            background: radial-gradient(circle at 10% 20%, rgba(229, 25, 55, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(15, 23, 42, 0.25) 0%, transparent 40%),
+                        linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .active-tab {
+            background-color: #E51937;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(229, 25, 55, 0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col antialiased selection:bg-brand-red selection:text-white">
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="fixed inset-0 login-bg z-50 flex items-center justify-center p-4">
+        <!-- Glow Orbs -->
+        <div class="absolute w-72 h-72 bg-brand-red/20 rounded-full blur-3xl -top-10 -left-10 pointer-events-none"></div>
+        <div class="absolute w-96 h-96 bg-blue-600/10 rounded-full blur-3xl -bottom-10 -right-10 pointer-events-none"></div>
+
+        <div class="glass-card rounded-2xl shadow-2xl p-8 max-w-md w-full border border-white/20 relative z-10 transition-all">
+            <div class="text-center mb-8">
+                <!-- Logo UKPBJ -->
+                <div class="mx-auto mb-4 w-20 h-20 rounded-2xl bg-gradient-to-tr from-brand-red to-rose-400 p-0.5 shadow-lg shadow-brand-red/30 flex items-center justify-center">
+                    <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center overflow-hidden">
+                        <img src="image/logo apk.png" alt="Logo UKPBJ" class="h-14 w-auto object-contain" onerror="this.src='https://via.placeholder.com/100?text=UKPBJ'">
+                    </div>
+                </div>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight">U<span class="text-brand-red">K</span>PBJ</h1>
+                <p class="text-xs text-slate-500 font-medium mt-1">Sistem Pengarsipan Surat Masuk & Keluar Modern</p>
+            </div>
+
+            <!-- Form Login Default -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <i class="fas fa-user text-sm"></i>
+                        </span>
+                        <input type="text" id="username" required placeholder="Masukkan username" 
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red focus:bg-white focus:outline-none text-sm transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <i class="fas fa-lock text-sm"></i>
+                        </span>
+                        <input type="password" id="password" required placeholder="Masukkan password" 
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red focus:bg-white focus:outline-none text-sm transition">
+                    </div>
+                </div>
+
+                <div id="loginError" class="bg-red-50 text-red-600 border border-red-200 p-3 rounded-xl text-xs text-center font-semibold hidden">
+                    <i class="fas fa-exclamation-circle mr-1"></i> Username atau password salah!
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-gradient-to-r from-brand-red to-rose-600 hover:from-brand-redHover hover:to-rose-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-brand-red/30 transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0">
+                    <i class="fas fa-right-to-bracket mr-2"></i> Masuk Aplikasi
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP DASHBOARD -->
+    <div id="mainApp" class="hidden flex-1 flex flex-col">
+        <!-- Header / Navbar -->
+        <header class="bg-brand-dark text-white shadow-xl border-b border-slate-800 sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+                <div class="flex items-center space-x-3.5">
+                    <div class="p-1.5 bg-white/10 backdrop-blur rounded-xl border border-white/10 shadow-inner flex items-center justify-center">
+                        <img src="image/logo apk.png" alt="Logo UKPBJ" class="h-8 w-8 object-contain" onerror="this.src='https://via.placeholder.com/40?text=UKPBJ'">
+                    </div>
+                    <div>
+                        <h1 class="text-base font-bold leading-tight tracking-wide">Pengarsipan Surat Masuk & Keluar</h1>
+                        <p class="text-[11px] text-slate-400 font-medium">Unit Kerja Pengadaan Barang/Jasa (UKPBJ)</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden sm:flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="userBadge" class="text-xs font-medium text-slate-300"><i class="fas fa-user-circle mr-1 text-brand-red"></i> -</span>
+                    </div>
+                    <button onclick="handleLogout()" class="bg-gradient-to-r from-brand-red to-rose-600 hover:from-brand-redHover hover:to-rose-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white shadow-md shadow-brand-red/20 transition">
+                        <i class="fas fa-sign-out-alt mr-1.5"></i> Keluar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+            
+            <!-- STATS WIDGETS -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Surat Masuk</p>
+                        <h3 id="statSuratMasuk" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-rose-50 text-brand-red flex items-center justify-center text-xl font-bold">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Surat Keluar</p>
+                        <h3 id="statSuratKeluar" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between sm:col-span-2 lg:col-span-1">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Seluruh Arsip</p>
+                        <h3 id="statTotal" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-xl font-bold">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation & Search Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-slate-200/80">
+                <div class="flex space-x-2 w-full sm:w-auto">
+                    <button onclick="switchTab('suratMasuk')" id="tabSuratMasuk" class="flex-1 sm:flex-none py-2.5 px-5 text-xs font-bold rounded-xl transition duration-200 active-tab flex items-center justify-center">
+                        <i class="fas fa-inbox mr-2"></i> Surat Masuk
+                    </button>
+                    <button onclick="switchTab('suratKeluar')" id="tabSuratKeluar" class="flex-1 sm:flex-none py-2.5 px-5 text-xs font-bold text-slate-500 hover:text-brand-red rounded-xl transition duration-200 flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-2"></i> Surat Keluar
+                    </button>
+                </div>
+
+                <!-- Search Field -->
+                <div class="relative w-full sm:w-72 px-2 pb-2 sm:pb-0">
+                    <span class="absolute inset-y-0 left-5 flex items-center text-slate-400">
+                        <i class="fas fa-search text-xs"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari nomor, perihal..." 
+                        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition">
+                </div>
+            </div>
+
+            <!-- SECTION SURAT MASUK -->
+            <div id="sectionSuratMasuk">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Form Input Surat Masuk -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 h-fit">
+                        <h2 class="text-sm font-bold text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
+                            <span class="flex items-center"><i class="fas fa-plus-circle text-brand-red mr-2"></i> Catat Surat Masuk</span>
+                        </h2>
+                        <form id="formSuratMasuk" onsubmit="addSuratMasuk(event)" class="space-y-3.5 text-xs">
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Nomor Surat</label>
+                                <input type="text" id="sm_nomor" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition" placeholder="Contoh: 005/123/2026">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-semibold text-slate-700 mb-1">Tanggal Surat</label>
+                                    <input type="date" id="sm_tanggal" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold text-slate-700 mb-1">Tanggal Terima</label>
+                                    <input type="date" id="sm_tgl_terima" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Perihal</label>
+                                <input type="text" id="sm_perihal" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition" placeholder="Undangan Pembekalan...">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Instansi Pengirim / Tujuan Bidang</label>
+                                <input type="text" id="sm_instansi_bidang" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition" placeholder="Contoh: Dinas Kesehatan / Sekretariat">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Keterangan</label>
+                                <textarea id="sm_keterangan" rows="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition" placeholder="Catatan tambahan..."></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-gradient-to-r from-brand-red to-rose-600 hover:from-brand-redHover hover:to-rose-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-brand-red/20 flex items-center justify-center">
+                                <i class="fas fa-save mr-2"></i> Simpan Surat Masuk
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Tabel Daftar Surat Masuk -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                            <h2 class="text-sm font-bold text-slate-800 flex items-center">
+                                <i class="fas fa-list text-slate-600 mr-2"></i> Daftar Surat Masuk
+                            </h2>
+                            <span id="countSM" class="bg-rose-50 text-brand-red font-bold text-xs px-3 py-1 rounded-full border border-rose-100">0 Data</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                        <th class="p-3 rounded-l-lg">No</th>
+                                        <th class="p-3">No. Surat</th>
+                                        <th class="p-3">Tgl Surat</th>
+                                        <th class="p-3">Tgl Terima</th>
+                                        <th class="p-3">Perihal</th>
+                                        <th class="p-3">Pengirim / Tujuan</th>
+                                        <th class="p-3">Ket.</th>
+                                        <th class="p-3 text-center rounded-r-lg">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodySuratMasuk" class="divide-y divide-slate-100">
+                                    <!-- Data disisipkan via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION SURAT KELUAR -->
+            <div id="sectionSuratKeluar" class="hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Form Input Surat Keluar -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 h-fit">
+                        <h2 class="text-sm font-bold text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
+                            <span class="flex items-center"><i class="fas fa-plus-circle text-brand-red mr-2"></i> Catat Surat Keluar</span>
+                        </h2>
+                        <form id="formSuratKeluar" onsubmit="addSuratKeluar(event)" class="space-y-3.5 text-xs">
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Nomor Surat</label>
+                                <input type="text" id="sk_nomor" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition" placeholder="Contoh: 005/SK/2026">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Tanggal Surat</label>
+                                <input type="date" id="sk_tanggal" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition">
+                            </div>
+                            <div>
+                                 <label class="block font-semibold text-slate-700 mb-1">Tanggal terima</label>
+                                <input type="date" id="sk_tanggal" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Perihal</label>
+                                <input type="text" id="sk_perihal" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition" placeholder="Pemberitahuan Kegiatan...">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Bidang Asal / Tujuan Instansi</label>
+                                <input type="text" id="sk_asal_tujuan" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition" placeholder="Contoh: Sekretariat / Bupati">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Keterangan</label>
+                                <textarea id="sk_keterangan" rows="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition" placeholder="Catatan tambahan..."></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-gradient-to-r from-brand-red to-rose-600 hover:from-brand-redHover hover:to-rose-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-brand-red/20 flex items-center justify-center">
+                                <i class="fas fa-save mr-2"></i> Simpan Surat Keluar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Tabel Daftar Surat Keluar -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                            <h2 class="text-sm font-bold text-slate-800 flex items-center">
+                                <i class="fas fa-list text-slate-600 mr-2"></i> Daftar Surat Keluar
+                            </h2>
+                            <span id="countSK" class="bg-rose-50 text-brand-red font-bold text-xs px-3 py-1 rounded-full border border-rose-100">0 Data</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                        <th class="p-3 rounded-l-lg">No</th>
+                                        <th class="p-3">No. Surat</th>
+                                        <th class="p-3">Tgl Surat</th>
+                                        <th class="p-3">Tgl terima</th>
+                                        <th class="p-3">Perihal</th>
+                                        <th class="p-3">Bidang Asal / Tujuan</th>
+                                        <th class="p-3">Ket.</th>
+                                        <th class="p-3 text-center rounded-r-lg">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodySuratKeluar" class="divide-y divide-slate-100">
+                                    <!-- Data disisipkan via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-200 text-slate-500 text-xs py-4 text-center mt-auto">
+            &copy; Pengarsipan Surat Masuk dan Keluar - Created by <span class="font-semibold text-slate-700">Permadi & Fatir</span>. All Rights Reserved.
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // KREDENSIAL DEFAULT
+        const DEFAULT_USER = "2.2";
+        const DEFAULT_PASS = "12341234";
+
+        // Data Local Storage untuk Aplikasi Pengarsipan
+        let dataSuratMasuk = JSON.parse(localStorage.getItem('ukpbj_surat_masuk')) || [];
+        let dataSuratKeluar = JSON.parse(localStorage.getItem('ukpbj_surat_keluar')) || [];
+        let activeTabName = 'suratMasuk';
+
+        // Cek Sesi Login saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            const loggedInUser = localStorage.getItem('ukpbj_session');
+            if (loggedInUser) {
+                loginSuccess(loggedInUser);
+            }
+        });
+
+        // Fungsi Login Default
+        function handleLogin(e) {
+            e.preventDefault();
+            const inputUsername = document.getElementById('username').value.trim();
+            const inputPassword = document.getElementById('password').value;
+            const errorMsg = document.getElementById('loginError');
+
+            if (inputUsername === DEFAULT_USER && inputPassword === DEFAULT_PASS) {
+                errorMsg.classList.add('hidden');
+                localStorage.setItem('ukpbj_session', inputUsername);
+                loginSuccess(inputUsername);
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        // Callback Saat Login Berhasil
+        function loginSuccess(username) {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userBadge').innerHTML = `<i class="fas fa-user-circle mr-1 text-brand-red"></i> ${username}`;
+            renderTables();
+            updateStats();
+        }
+
+        // Fungsi Logout
+        function handleLogout() {
+            localStorage.removeItem('ukpbj_session');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+
+        // Tab Switcher
+        function switchTab(tabName) {
+            activeTabName = tabName;
+            const btnSM = document.getElementById('tabSuratMasuk');
+            const btnSK = document.getElementById('tabSuratKeluar');
+            const secSM = document.getElementById('sectionSuratMasuk');
+            const secSK = document.getElementById('sectionSuratKeluar');
+
+            if (tabName === 'suratMasuk') {
+                btnSM.className = "flex-1 sm:flex-none py-2.5 px-5 text-xs font-bold rounded-xl transition duration-200 active-tab flex items-center justify-center";
+                btnSK.className = "flex-1 sm:flex-none py-2.5 px-5 text-xs font-bold text-slate-500 hover:text-brand-red rounded-xl transition duration-200 flex items-center justify-center";
+                secSM.classList.remove('hidden');
+                secSK.classList.add('hidden');
+            } else {
+                btnSK.className = "flex-1 sm:flex-none py-2.5 px-5 text-xs font-bold rounded-xl transition duration-200 active-tab flex items-center justify-center";
+                btnSM.className = "flex-1 sm:flex-none py-2.5 px-5 text-xs font-bold text-slate-500 hover:text-brand-red rounded-xl transition duration-200 flex items-center justify-center";
+                secSK.classList.remove('hidden');
+                secSM.classList.add('hidden');
+            }
+            renderTables();
+        }
+
+        // Update Statistik
+        function updateStats() {
+            document.getElementById('statSuratMasuk').innerText = dataSuratMasuk.length;
+            document.getElementById('statSuratKeluar').innerText = dataSuratKeluar.length;
+            document.getElementById('statTotal').innerText = dataSuratMasuk.length + dataSuratKeluar.length;
+        }
+
+        // Tambah Surat Masuk
+        function addSuratMasuk(e) {
+            e.preventDefault();
+            const item = {
+                id: Date.now(),
+                nomor: document.getElementById('sm_nomor').value,
+                tanggal: document.getElementById('sm_tanggal').value,
+                tgl_terima: document.getElementById('sm_tgl_terima').value,
+                perihal: document.getElementById('sm_perihal').value,
+                instansi_bidang: document.getElementById('sm_instansi_bidang').value,
+                keterangan: document.getElementById('sm_keterangan').value
+            };
+
+            dataSuratMasuk.push(item);
+            localStorage.setItem('ukpbj_surat_masuk', JSON.stringify(dataSuratMasuk));
+            document.getElementById('formSuratMasuk').reset();
+            renderTables();
+            updateStats();
+        }
+
+        // Tambah Surat Keluar
+        function addSuratKeluar(e) {
+            e.preventDefault();
+            const item = {
+                id: Date.now(),
+                nomor: document.getElementById('sk_nomor').value,
+                tanggal: document.getElementById('sk_tanggal').value,
+                perihal: document.getElementById('sk_perihal').value,
+                asal_tujuan: document.getElementById('sk_asal_tujuan').value,
+                keterangan: document.getElementById('sk_keterangan').value
+            };
+
+            dataSuratKeluar.push(item);
+            localStorage.setItem('ukpbj_surat_keluar', JSON.stringify(dataSuratKeluar));
+            document.getElementById('formSuratKeluar').reset();
+            renderTables();
+            updateStats();
+        }
+
+        // Hapus Data
+        function deleteSurat(type, id) {
+            if (confirm('Yakin ingin menghapus data pengarsipan ini?')) {
+                if (type === 'masuk') {
+                    dataSuratMasuk = dataSuratMasuk.filter(item => item.id !== id);
+                    localStorage.setItem('ukpbj_surat_masuk', JSON.stringify(dataSuratMasuk));
+                } else {
+                    dataSuratKeluar = dataSuratKeluar.filter(item => item.id !== id);
+                    localStorage.setItem('ukpbj_surat_keluar', JSON.stringify(dataSuratKeluar));
+                }
+                renderTables();
+                updateStats();
+            }
+        }
+
+        // Fitur Pencarian
+        function handleSearch() {
+            renderTables();
+        }
+
+        // Render Table Data
+        function renderTables() {
+            const query = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase().trim() : '';
+
+            // Filter Data Surat Masuk
+            const filteredSM = dataSuratMasuk.filter(item => 
+                item.nomor.toLowerCase().includes(query) ||
+                item.perihal.toLowerCase().includes(query) ||
+                item.instansi_bidang.toLowerCase().includes(query) ||
+                (item.keterangan && item.keterangan.toLowerCase().includes(query))
+            );
+
+            // Filter Data Surat Keluar
+            const filteredSK = dataSuratKeluar.filter(item => 
+                item.nomor.toLowerCase().includes(query) ||
+                item.perihal.toLowerCase().includes(query) ||
+                item.asal_tujuan.toLowerCase().includes(query) ||
+                (item.keterangan && item.keterangan.toLowerCase().includes(query))
+            );
+
+            // Render Surat Masuk
+            const tbodySM = document.getElementById('tbodySuratMasuk');
+            tbodySM.innerHTML = '';
+            document.getElementById('countSM').innerText = `${filteredSM.length} Data`;
+
+            if (filteredSM.length === 0) {
+                tbodySM.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400 font-medium">Belum ada data surat masuk yang sesuai</td></tr>`;
+            } else {
+                filteredSM.forEach((item, index) => {
+                    tbodySM.innerHTML += `
+                        <tr class="hover:bg-slate-50/80 transition duration-150">
+                            <td class="p-3 text-slate-400 font-medium">${index + 1}</td>
+                            <td class="p-3 font-semibold text-slate-800">${item.nomor}</td>
+                            <td class="p-3 text-slate-600">${item.tanggal}</td>
+                            <td class="p-3 text-slate-600">${item.tgl_terima || '-'}</td>
+                            <td class="p-3 text-slate-700 font-medium">${item.perihal}</td>
+                            <td class="p-3"><span class="bg-rose-50 text-brand-red border border-rose-100 px-2.5 py-1 rounded-lg font-semibold">${item.instansi_bidang}</span></td>
+                            <td class="p-3 text-slate-500">${item.keterangan || '-'}</td>
+                            <td class="p-3 text-center">
+                                <button onclick="deleteSurat('masuk', ${item.id})" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center mx-auto">
+                                    <i class="fas fa-trash-alt text-xs"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Render Surat Keluar
+            const tbodySK = document.getElementById('tbodySuratKeluar');
+            tbodySK.innerHTML = '';
+            document.getElementById('countSK').innerText = `${filteredSK.length} Data`;
+
+            if (filteredSK.length === 0) {
+                tbodySK.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 font-medium">Belum ada data surat keluar yang sesuai</td></tr>`;
+            } else {
+                filteredSK.forEach((item, index) => {
+                    tbodySK.innerHTML += `
+                        <tr class="hover:bg-slate-50/80 transition duration-150">
+                            <td class="p-3 text-slate-400 font-medium">${index + 1}</td>
+                            <td class="p-3 font-semibold text-slate-800">${item.nomor}</td>
+                            <td class="p-3 text-slate-600">${item.tanggal}</td>
+                            <td class="p-3 text-slate-700 font-medium">${item.perihal}</td>
+                            <td class="p-3"><span class="bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-1 rounded-lg font-semibold">${item.asal_tujuan}</span></td>
+                            <td class="p-3 text-slate-500">${item.keterangan || '-'}</td>
+                            <td class="p-3 text-center">
+                                <button onclick="deleteSurat('keluar', ${item.id})" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center mx-auto">
+                                    <i class="fas fa-trash-alt text-xs"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
