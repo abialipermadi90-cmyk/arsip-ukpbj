@@ -73,13 +73,11 @@
 
     <!-- LOGIN PAGE -->
     <div id="loginPage" class="fixed inset-0 login-bg z-50 flex items-center justify-center p-4">
-        <!-- Glow Orbs -->
         <div class="absolute w-72 h-72 bg-brand-red/20 rounded-full blur-3xl -top-10 -left-10 pointer-events-none"></div>
         <div class="absolute w-96 h-96 bg-blue-600/10 rounded-full blur-3xl -bottom-10 -right-10 pointer-events-none"></div>
 
         <div class="glass-card rounded-2xl shadow-2xl p-8 max-w-md w-full border border-white/20 relative z-10 transition-all">
             <div class="text-center mb-8">
-                <!-- Logo UKPBJ -->
                 <div class="mx-auto mb-4 w-20 h-20 rounded-2xl bg-gradient-to-tr from-brand-red to-rose-400 p-0.5 shadow-lg shadow-brand-red/30 flex items-center justify-center">
                     <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center overflow-hidden">
                         <img src="logo apk.png" alt="Logo UKPBJ" class="h-14 w-auto object-contain" onerror="this.src='https://via.placeholder.com/100?text=UKPBJ'">
@@ -89,7 +87,7 @@
                 <p class="text-xs text-slate-500 font-medium mt-1">Sistem Pengarsipan Surat Masuk & Keluar Modern</p>
             </div>
 
-            <!-- Form Login Default -->
+            <!-- Form Login -->
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username</label>
@@ -272,7 +270,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tbodySuratMasuk" class="divide-y divide-slate-100">
-                                    <!-- Data disisipkan via JS -->
                                 </tbody>
                             </table>
                         </div>
@@ -293,13 +290,15 @@
                                 <label class="block font-semibold text-slate-700 mb-1">Nomor Surat</label>
                                 <input type="text" id="sk_nomor" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition" placeholder="Contoh: 005/SK/2026">
                             </div>
-                            <div>
-                                <label class="block font-semibold text-slate-700 mb-1">Tanggal Surat</label>
-                                <input type="date" id="sk_tanggal" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition">
-                            </div>
-                            <div>
-                                 <label class="block font-semibold text-slate-700 mb-1">Tanggal terima</label>
-                                <input type="date" id="sk_tanggal" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-semibold text-slate-700 mb-1">Tanggal Surat</label>
+                                    <input type="date" id="sk_tanggal" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold text-slate-700 mb-1">Tanggal Terima</label>
+                                    <input type="date" id="sk_tgl_terima" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red focus:bg-white focus:outline-none transition">
+                                </div>
                             </div>
                             <div>
                                 <label class="block font-semibold text-slate-700 mb-1">Perihal</label>
@@ -334,7 +333,7 @@
                                         <th class="p-3 rounded-l-lg">No</th>
                                         <th class="p-3">No. Surat</th>
                                         <th class="p-3">Tgl Surat</th>
-                                        <th class="p-3">Tgl terima</th>
+                                        <th class="p-3">Tgl Terima</th>
                                         <th class="p-3">Perihal</th>
                                         <th class="p-3">Bidang Asal / Tujuan</th>
                                         <th class="p-3">Ket.</th>
@@ -342,7 +341,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tbodySuratKeluar" class="divide-y divide-slate-100">
-                                    <!-- Data disisipkan via JS -->
                                 </tbody>
                             </table>
                         </div>
@@ -358,47 +356,42 @@
         </footer>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // KREDENSIAL DEFAULT
-        const DEFAULT_USER = "2.2";
-        const DEFAULT_PASS = "12341234";
-
-       <!-- SDK Google Firebase (Compat Version) -->
+    <!-- SDK Google Firebase (Compat Version) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         // KREDENSIAL DEFAULT LOGIN
         const DEFAULT_USER = "2.2";
         const DEFAULT_PASS = "12341234";
 
-        // 1. TEMPELKAN KONFIGURASI FIREBASE ANDA DI SINI
+        // KONFIGURASI FIREBASE
         const firebaseConfig = {
-  apiKey: "AIzaSyCwwZUVuGWd0d7XKmI8Sh6Uh5kCVPewQwA",
-  authDomain: "proje-e5d8f.firebaseapp.com",
-  projectId: "proje-e5d8f",
-  storageBucket: "proje-e5d8f.firebasestorage.app",
-  messagingSenderId: "159604863046",
-  appId: "1:159604863046:web:838bc071d4091f48b25a47",
-  measurementId: "G-05HR6K1L6T"
-};
+            apiKey: "AIzaSyCwwZUVuGWd0d7XKmI8Sh6Uh5kCVPewQwA",
+            authDomain: "proje-e5d8f.firebaseapp.com",
+            projectId: "proje-e5d8f",
+            storageBucket: "proje-e5d8f.firebasestorage.app",
+            messagingSenderId: "159604863046",
+            appId: "1:159604863046:web:838bc071d4091f48b25a47",
+            measurementId: "G-05HR6K1L6T"
+        };
 
-        // 2. INISIALISASI FIREBASE
+        // INISIALISASI FIREBASE
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         let dataSuratMasuk = [];
         let dataSuratKeluar = [];
 
-        // Cek Sesi Login & Sinkronisasi Data Realtime saat Halaman Dimuat
+        // Cek Sesi Login & Sinkronisasi Data Realtime dari Cloud Firebase
         window.addEventListener('DOMContentLoaded', () => {
             const loggedInUser = localStorage.getItem('ukpbj_session');
             if (loggedInUser) {
                 loginSuccess(loggedInUser);
             }
 
-            // Ambil Data Surat Masuk dari Firebase secara Realtime
+            // Ambil Data Surat Masuk Realtime
             db.ref('surat_masuk').on('value', (snapshot) => {
                 const data = snapshot.val();
                 dataSuratMasuk = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
@@ -406,7 +399,7 @@
                 updateStats();
             });
 
-            // Ambil Data Surat Keluar dari Firebase secara Realtime
+            // Ambil Data Surat Keluar Realtime
             db.ref('surat_keluar').on('value', (snapshot) => {
                 const data = snapshot.val();
                 dataSuratKeluar = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
@@ -429,7 +422,10 @@
             };
 
             db.ref('surat_masuk').push(item)
-                .then(() => document.getElementById('formSuratMasuk').reset())
+                .then(() => {
+                    document.getElementById('formSuratMasuk').reset();
+                    alert("Berhasil menyimpan data Surat Masuk ke Cloud!");
+                })
                 .catch(err => alert("Gagal menyimpan ke cloud: " + err.message));
         }
 
@@ -439,6 +435,7 @@
             const item = {
                 nomor: document.getElementById('sk_nomor').value,
                 tanggal: document.getElementById('sk_tanggal').value,
+                tgl_terima: document.getElementById('sk_tgl_terima').value,
                 perihal: document.getElementById('sk_perihal').value,
                 asal_tujuan: document.getElementById('sk_asal_tujuan').value,
                 keterangan: document.getElementById('sk_keterangan').value,
@@ -446,7 +443,10 @@
             };
 
             db.ref('surat_keluar').push(item)
-                .then(() => document.getElementById('formSuratKeluar').reset())
+                .then(() => {
+                    document.getElementById('formSuratKeluar').reset();
+                    alert("Berhasil menyimpan data Surat Keluar ke Cloud!");
+                })
                 .catch(err => alert("Gagal menyimpan ke cloud: " + err.message));
         }
 
@@ -454,21 +454,12 @@
         function deleteSurat(type, id) {
             if (confirm('Yakin ingin menghapus data pengarsipan ini?')) {
                 const path = type === 'masuk' ? 'surat_masuk/' : 'surat_keluar/';
-                db.ref(path + id).remove();
+                db.ref(path + id).remove()
+                    .catch(err => alert("Gagal menghapus: " + err.message));
             }
         }
 
-        // Fungsi penunjang UI (handleLogin, handleLogout, switchTab, renderTables, dll. tetap sama)
-    
-        // Cek Sesi Login saat halaman dimuat
-        window.addEventListener('DOMContentLoaded', () => {
-            const loggedInUser = localStorage.getItem('ukpbj_session');
-            if (loggedInUser) {
-                loginSuccess(loggedInUser);
-            }
-        });
-
-        // Fungsi Login Default
+        // FUNGSI LOGIN
         function handleLogin(e) {
             e.preventDefault();
             const inputUsername = document.getElementById('username').value.trim();
@@ -484,7 +475,6 @@
             }
         }
 
-        // Callback Saat Login Berhasil
         function loginSuccess(username) {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
@@ -493,7 +483,6 @@
             updateStats();
         }
 
-        // Fungsi Logout
         function handleLogout() {
             localStorage.removeItem('ukpbj_session');
             document.getElementById('username').value = '';
@@ -503,9 +492,8 @@
             document.getElementById('mainApp').classList.add('hidden');
         }
 
-        // Tab Switcher
+        // TAB SWITCHER
         function switchTab(tabName) {
-            activeTabName = tabName;
             const btnSM = document.getElementById('tabSuratMasuk');
             const btnSK = document.getElementById('tabSuratKeluar');
             const secSM = document.getElementById('sectionSuratMasuk');
@@ -525,89 +513,34 @@
             renderTables();
         }
 
-        // Update Statistik
+        // STATISTIK
         function updateStats() {
             document.getElementById('statSuratMasuk').innerText = dataSuratMasuk.length;
             document.getElementById('statSuratKeluar').innerText = dataSuratKeluar.length;
             document.getElementById('statTotal').innerText = dataSuratMasuk.length + dataSuratKeluar.length;
         }
 
-        // Tambah Surat Masuk
-        function addSuratMasuk(e) {
-            e.preventDefault();
-            const item = {
-                id: Date.now(),
-                nomor: document.getElementById('sm_nomor').value,
-                tanggal: document.getElementById('sm_tanggal').value,
-                tgl_terima: document.getElementById('sm_tgl_terima').value,
-                perihal: document.getElementById('sm_perihal').value,
-                instansi_bidang: document.getElementById('sm_instansi_bidang').value,
-                keterangan: document.getElementById('sm_keterangan').value
-            };
-
-            dataSuratMasuk.push(item);
-            localStorage.setItem('ukpbj_surat_masuk', JSON.stringify(dataSuratMasuk));
-            document.getElementById('formSuratMasuk').reset();
-            renderTables();
-            updateStats();
-        }
-
-        // Tambah Surat Keluar
-        function addSuratKeluar(e) {
-            e.preventDefault();
-            const item = {
-                id: Date.now(),
-                nomor: document.getElementById('sk_nomor').value,
-                tanggal: document.getElementById('sk_tanggal').value,
-                perihal: document.getElementById('sk_perihal').value,
-                asal_tujuan: document.getElementById('sk_asal_tujuan').value,
-                keterangan: document.getElementById('sk_keterangan').value
-            };
-
-            dataSuratKeluar.push(item);
-            localStorage.setItem('ukpbj_surat_keluar', JSON.stringify(dataSuratKeluar));
-            document.getElementById('formSuratKeluar').reset();
-            renderTables();
-            updateStats();
-        }
-
-        // Hapus Data
-        function deleteSurat(type, id) {
-            if (confirm('Yakin ingin menghapus data pengarsipan ini?')) {
-                if (type === 'masuk') {
-                    dataSuratMasuk = dataSuratMasuk.filter(item => item.id !== id);
-                    localStorage.setItem('ukpbj_surat_masuk', JSON.stringify(dataSuratMasuk));
-                } else {
-                    dataSuratKeluar = dataSuratKeluar.filter(item => item.id !== id);
-                    localStorage.setItem('ukpbj_surat_keluar', JSON.stringify(dataSuratKeluar));
-                }
-                renderTables();
-                updateStats();
-            }
-        }
-
-        // Fitur Pencarian
         function handleSearch() {
             renderTables();
         }
 
-        // Render Table Data
+        // RENDER DATA TABEL
         function renderTables() {
             const query = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase().trim() : '';
 
-            // Filter Data Surat Masuk
+            // Filter Surat Masuk
             const filteredSM = dataSuratMasuk.filter(item => 
-                item.nomor.toLowerCase().includes(query) ||
-                item.perihal.toLowerCase().includes(query) ||
-                item.instansi_bidang.toLowerCase().includes(query) ||
+                (item.nomor && item.nomor.toLowerCase().includes(query)) ||
+                (item.perihal && item.perihal.toLowerCase().includes(query)) ||
+                (item.instansi_bidang && item.instansi_bidang.toLowerCase().includes(query)) ||
                 (item.keterangan && item.keterangan.toLowerCase().includes(query))
             );
 
-            // Filter Data Surat Keluar
+            // Filter Surat Keluar
             const filteredSK = dataSuratKeluar.filter(item => 
-                item.nomor.toLowerCase().includes(query) ||
-                item.perihal.toLowerCase().includes(query) ||
-                item.asal_tujuan.toLowerCase().includes(query) ||
+                (item.nomor && item.nomor.toLowerCase().includes(query)) ||
+                (item.perihal && item.perihal.toLowerCase().includes(query)) ||
+                (item.asal_tujuan && item.asal_tujuan.toLowerCase().includes(query)) ||
                 (item.keterangan && item.keterangan.toLowerCase().includes(query))
             );
 
@@ -630,7 +563,7 @@
                             <td class="p-3"><span class="bg-rose-50 text-brand-red border border-rose-100 px-2.5 py-1 rounded-lg font-semibold">${item.instansi_bidang}</span></td>
                             <td class="p-3 text-slate-500">${item.keterangan || '-'}</td>
                             <td class="p-3 text-center">
-                                <button onclick="deleteSurat('masuk', ${item.id})" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center mx-auto">
+                                <button onclick="deleteSurat('masuk', '${item.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center mx-auto">
                                     <i class="fas fa-trash-alt text-xs"></i>
                                 </button>
                             </td>
@@ -645,7 +578,7 @@
             document.getElementById('countSK').innerText = `${filteredSK.length} Data`;
 
             if (filteredSK.length === 0) {
-                tbodySK.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 font-medium">Belum ada data surat keluar yang sesuai</td></tr>`;
+                tbodySK.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400 font-medium">Belum ada data surat keluar yang sesuai</td></tr>`;
             } else {
                 filteredSK.forEach((item, index) => {
                     tbodySK.innerHTML += `
@@ -653,11 +586,12 @@
                             <td class="p-3 text-slate-400 font-medium">${index + 1}</td>
                             <td class="p-3 font-semibold text-slate-800">${item.nomor}</td>
                             <td class="p-3 text-slate-600">${item.tanggal}</td>
+                            <td class="p-3 text-slate-600">${item.tgl_terima || '-'}</td>
                             <td class="p-3 text-slate-700 font-medium">${item.perihal}</td>
                             <td class="p-3"><span class="bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-1 rounded-lg font-semibold">${item.asal_tujuan}</span></td>
                             <td class="p-3 text-slate-500">${item.keterangan || '-'}</td>
                             <td class="p-3 text-center">
-                                <button onclick="deleteSurat('keluar', ${item.id})" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center mx-auto">
+                                <button onclick="deleteSurat('keluar', '${item.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition flex items-center justify-center mx-auto">
                                     <i class="fas fa-trash-alt text-xs"></i>
                                 </button>
                             </td>
