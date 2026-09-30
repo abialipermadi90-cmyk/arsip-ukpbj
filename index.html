@@ -364,11 +364,102 @@
         const DEFAULT_USER = "2.2";
         const DEFAULT_PASS = "12341234";
 
-        // Data Local Storage untuk Aplikasi Pengarsipan
-        let dataSuratMasuk = JSON.parse(localStorage.getItem('ukpbj_surat_masuk')) || [];
-        let dataSuratKeluar = JSON.parse(localStorage.getItem('ukpbj_surat_keluar')) || [];
-        let activeTabName = 'suratMasuk';
+       <!-- SDK Google Firebase (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+    <script>
+        // KREDENSIAL DEFAULT LOGIN
+        const DEFAULT_USER = "2.2";
+        const DEFAULT_PASS = "12341234";
+
+        // 1. TEMPELKAN KONFIGURASI FIREBASE ANDA DI SINI
+        const firebaseConfig = {
+  apiKey: "AIzaSyCwwZUVuGWd0d7XKmI8Sh6Uh5kCVPewQwA",
+  authDomain: "proje-e5d8f.firebaseapp.com",
+  projectId: "proje-e5d8f",
+  storageBucket: "proje-e5d8f.firebasestorage.app",
+  messagingSenderId: "159604863046",
+  appId: "1:159604863046:web:838bc071d4091f48b25a47",
+  measurementId: "G-05HR6K1L6T"
+};
+
+        // 2. INISIALISASI FIREBASE
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let dataSuratMasuk = [];
+        let dataSuratKeluar = [];
+
+        // Cek Sesi Login & Sinkronisasi Data Realtime saat Halaman Dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            const loggedInUser = localStorage.getItem('ukpbj_session');
+            if (loggedInUser) {
+                loginSuccess(loggedInUser);
+            }
+
+            // Ambil Data Surat Masuk dari Firebase secara Realtime
+            db.ref('surat_masuk').on('value', (snapshot) => {
+                const data = snapshot.val();
+                dataSuratMasuk = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+                renderTables();
+                updateStats();
+            });
+
+            // Ambil Data Surat Keluar dari Firebase secara Realtime
+            db.ref('surat_keluar').on('value', (snapshot) => {
+                const data = snapshot.val();
+                dataSuratKeluar = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+                renderTables();
+                updateStats();
+            });
+        });
+
+        // SIMPAN SURAT MASUK KE FIREBASE
+        function addSuratMasuk(e) {
+            e.preventDefault();
+            const item = {
+                nomor: document.getElementById('sm_nomor').value,
+                tanggal: document.getElementById('sm_tanggal').value,
+                tgl_terima: document.getElementById('sm_tgl_terima').value,
+                perihal: document.getElementById('sm_perihal').value,
+                instansi_bidang: document.getElementById('sm_instansi_bidang').value,
+                keterangan: document.getElementById('sm_keterangan').value,
+                timestamp: Date.now()
+            };
+
+            db.ref('surat_masuk').push(item)
+                .then(() => document.getElementById('formSuratMasuk').reset())
+                .catch(err => alert("Gagal menyimpan ke cloud: " + err.message));
+        }
+
+        // SIMPAN SURAT KELUAR KE FIREBASE
+        function addSuratKeluar(e) {
+            e.preventDefault();
+            const item = {
+                nomor: document.getElementById('sk_nomor').value,
+                tanggal: document.getElementById('sk_tanggal').value,
+                perihal: document.getElementById('sk_perihal').value,
+                asal_tujuan: document.getElementById('sk_asal_tujuan').value,
+                keterangan: document.getElementById('sk_keterangan').value,
+                timestamp: Date.now()
+            };
+
+            db.ref('surat_keluar').push(item)
+                .then(() => document.getElementById('formSuratKeluar').reset())
+                .catch(err => alert("Gagal menyimpan ke cloud: " + err.message));
+        }
+
+        // HAPUS SURAT DARI FIREBASE
+        function deleteSurat(type, id) {
+            if (confirm('Yakin ingin menghapus data pengarsipan ini?')) {
+                const path = type === 'masuk' ? 'surat_masuk/' : 'surat_keluar/';
+                db.ref(path + id).remove();
+            }
+        }
+
+        // Fungsi penunjang UI (handleLogin, handleLogout, switchTab, renderTables, dll. tetap sama)
+    
         // Cek Sesi Login saat halaman dimuat
         window.addEventListener('DOMContentLoaded', () => {
             const loggedInUser = localStorage.getItem('ukpbj_session');
